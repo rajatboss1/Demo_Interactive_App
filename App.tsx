@@ -1,8 +1,8 @@
 
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { GoogleGenAI } from "@google/genai";
-import { APP_FLOW } from './constants';
-import { ContentType, TrainingState, ActionButton, AppNode } from './types';
+import { APP_FLOW } from './constants.ts';
+import { ContentType, TrainingState, ActionButton, AppNode } from './types.ts';
 
 // --- Immersive UI Components ---
 
@@ -93,17 +93,16 @@ const AICoachChat: React.FC<ChatModalProps> = ({ prompt, goal, actions, onAction
     setIsTyping(true);
 
     try {
-      const chat = genAI.models.generateContent({
+      const response = await genAI.models.generateContent({
         model: "gemini-3-flash-preview",
         contents: [
-          { role: 'user', parts: [{ text: `You are Chirag, an elite cricket coach. Hinglish responses. Goal: ${goal}. Respond to: ${userMsg}. Max 50 words.` }] }
+          { role: 'user', parts: [{ text: `You are Chirag, an elite cricket coach. Goal: ${goal}. Respond to user: ${userMsg}. Max 50 words.` }] }
         ],
         config: {
             systemInstruction: "You are Coach Chirag. Elite academy leader. Use Hinglish mixed with professional cricket terminology."
         }
       });
 
-      const response = await chat;
       const responseText = response.text || "Focus on the goal, player.";
       setMessages(prev => [...prev, { role: 'model', text: responseText }]);
     } catch (err) {
